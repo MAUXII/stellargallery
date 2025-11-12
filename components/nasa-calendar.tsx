@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { format } from "date-fns"
@@ -41,13 +42,12 @@ interface NASAImagesResponse {
 }
 
 export function NasaCalendar() {
-  // NASA Images API states
   const [selectedYear, setSelectedYear] = React.useState<string>("")
   const [imagesData, setImagesData] = React.useState<NASAImagesResponse | null>(null)
   const [imagesLoading, setImagesLoading] = React.useState(false)
   const [imagesError, setImagesError] = React.useState<string | null>(null)
   
-  // Gerar lista de anos (de 1930 até o ano atual - primeira foto da NASA foi em 1930)
+  // primeira foto da NASA foi em 1930
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: currentYear - 1929 }, (_, i) => 
     (currentYear - i).toString()
@@ -57,7 +57,6 @@ export function NasaCalendar() {
     if (selectedYear) {
       fetchNASAImages(selectedYear)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedYear])
 
   const fetchNASAImages = React.useCallback(async (year: string) => {
@@ -132,9 +131,38 @@ export function NasaCalendar() {
         </div>
 
         {imagesLoading && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Loading images...</p>
-          </div>
+          <section className="bg-background py-8 w-full">
+            <div className="container mx-auto px-4">
+            <p className="text-sm text-muted-foreground mb-10 text-center">
+                Found ... images
+              </p>
+              <div className="relative mx-auto max-w-xl pb-10">
+                <Separator
+                  orientation="vertical"
+                  className="bg-muted absolute left-2 top-0 bottom-0"
+                />
+                
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="relative mb-10 pl-8">
+                    <div className="bg-foreground absolute left-0 top-3.5 flex size-4 items-center justify-center rounded-full" />
+                    
+                    <Skeleton className="h-7 w-3/4 mb-2" />
+                    
+                    <Skeleton className="h-5 w-24 mb-4 md:absolute md:left-[-120px] md:w-[100px]" />
+                    
+                    <Card className="my-5 border-none bg-transparent shadow-none">
+                      <CardContent className="px-0 xl:px-2">
+                        <Skeleton className="w-full h-64 rounded-lg mb-4" />
+                        <Skeleton className="h-4 w-full mb-2" />
+                        <Skeleton className="h-4 w-5/6 mb-2" />
+                        <Skeleton className="h-4 w-4/6" />
+                      </CardContent>
+                    </Card>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         )}
 
         {imagesError && (

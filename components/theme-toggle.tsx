@@ -10,7 +10,6 @@ export function ThemeToggle() {
 
   React.useEffect(() => {
     setMounted(true)
-    // Verificar preferência do sistema ou localStorage
     const stored = localStorage.getItem("theme") as "light" | "dark" | null
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
     
