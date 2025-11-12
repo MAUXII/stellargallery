@@ -13,6 +13,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Input } from "@/components/ui/input"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { format } from "date-fns"
@@ -43,6 +44,7 @@ interface NASAImagesResponse {
 
 export function NasaCalendar() {
   const [selectedYear, setSelectedYear] = React.useState<string>("")
+  const [searchQuery, setSearchQuery] = React.useState<string>("")
   const [imagesData, setImagesData] = React.useState<NASAImagesResponse | null>(null)
   const [imagesLoading, setImagesLoading] = React.useState(false)
   const [imagesError, setImagesError] = React.useState<string | null>(null)
@@ -55,11 +57,12 @@ export function NasaCalendar() {
 
   React.useEffect(() => {
     if (selectedYear) {
-      fetchNASAImages(selectedYear)
+      fetchNASAImages(selectedYear, searchQuery)
     }
-  }, [selectedYear])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedYear, searchQuery])
 
-  const fetchNASAImages = React.useCallback(async (year: string) => {
+  const fetchNASAImages = React.useCallback(async (year: string, query?: string) => {
     if (!year || year.length !== 4) {
       setImagesError("Please enter a valid 4-digit year")
       return
@@ -76,7 +79,11 @@ export function NasaCalendar() {
     setImagesData(null)
 
     try {
-      const url = `https://images-api.nasa.gov/search?year_start=${year}&year_end=${year}&media_type=image&page_size=500`
+      let url = `https://images-api.nasa.gov/search?year_start=${year}&year_end=${year}&media_type=image&page_size=500`
+      
+      if (query && query.trim()) {
+        url += `&q=${encodeURIComponent(query.trim())}`
+      }
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 15000)
@@ -107,12 +114,19 @@ export function NasaCalendar() {
   }, [])
 
   return (
-    <div className="flex flex-col items-center gap-8 md:p-32 mx-auto w-full min-h-screen">
+    <div className="flex flex-col items-center gap-8 md:p-32 mx-auto w-full ">
       <ThemeToggle />
       <ScrollToTop />
       
       <div className="w-full flex flex-col items-center justify-center">
-        <div className="flex gap-4 justify-center items-center -mt-16 mb-6">
+        <div className="flex gap-4 justify-center w-full max-w-xl items-center md:-mt-32 mb-6 pl-10 pr-4 md:pr-2 ">
+        <Input
+            type="text"
+            placeholder="Search (optional)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-[340px] min-h-[50px]"
+          />
           <Select value={selectedYear} onValueChange={setSelectedYear}>
             <SelectTrigger id="year-select" className="w-[240px] min-h-[50px]">
               <SelectValue placeholder="Select a year" />
@@ -128,14 +142,20 @@ export function NasaCalendar() {
             </SelectGroup>
             </SelectContent>
           </Select>
+          
+         
         </div>
 
         {imagesLoading && (
           <section className="bg-background py-8 w-full">
             <div className="container mx-auto px-4">
-            <p className="text-sm text-muted-foreground mb-10 text-center">
+            <div className="flex justify-center w-full max-w-xl items-center mx-auto mb-10">
+                    <div className="h-0.25 ml-10 bg-muted rounded-md flex-1"/>
+            <p className="text-sm px-2 text-nowrap text-muted-foreground  text-center">
                 Found ... images
               </p>
+              <div className="h-0.25 bg-muted rounded-md flex-1"/>
+              </div>
               <div className="relative mx-auto max-w-xl pb-10">
                 <Separator
                   orientation="vertical"
@@ -144,7 +164,7 @@ export function NasaCalendar() {
                 
                 {Array.from({ length: 5 }).map((_, index) => (
                   <div key={index} className="relative mb-10 pl-8">
-                    <div className="bg-foreground absolute left-0 top-3.5 flex size-4 items-center justify-center rounded-full" />
+                    <div className="bg-muted-foreground absolute left-0 top-3.5 flex size-4 items-center justify-center rounded-full" />
                     
                     <Skeleton className="h-7 w-3/4 mb-2" />
                     
@@ -173,10 +193,15 @@ export function NasaCalendar() {
 
         {imagesData && !imagesLoading && !imagesError && (
           <section className="bg-background py-8 w-full">
-            <div className="container mx-auto px-4">
-              <p className="text-sm text-muted-foreground mb-10 text-center">
+            <div className="container mx-auto px-4 items-center justify-center">
+
+            <div className="flex justify-center w-full max-w-xl items-center mx-auto mb-10">
+                    <div className="h-0.25 ml-10 bg-muted rounded-md flex-1"/>
+            <p className="text-sm px-2 text-nowrap text-muted-foreground  text-center">
                 Found {imagesData.collection?.metadata?.total_hits || 0} images
               </p>
+              <div className="h-0.25 bg-muted rounded-md flex-1"/>
+              </div>
               
               <div className="relative mx-auto max-w-xl pb-10">
                 <Separator
@@ -207,7 +232,7 @@ export function NasaCalendar() {
 
                     return (
                       <div key={index} className="relative mb-10 pl-8">
-                        <div className="bg-foreground absolute left-0 top-3.5 flex size-4 items-center justify-center rounded-full" />
+                        <div className="bg-muted-foreground absolute left-0 top-3.5 flex size-4 items-center justify-center rounded-full" />
                         
                         <h4 className="rounded-xl md:text-start py-2 text-xl font-bold tracking-tight xl:mb-4 xl:px-3">
                           {imageData.title}
