@@ -158,8 +158,6 @@ li {
 }
 
 .t {
-  animation-name: titleflip;
-  animation: titleflip 5s ease-in-out infinite;
   font-family: sans-serif;
   }
 

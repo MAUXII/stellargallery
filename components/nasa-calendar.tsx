@@ -43,14 +43,12 @@ interface NASAImagesResponse {
 }
 
 export function NasaCalendar() {
-  const [selectedYear, setSelectedYear] = React.useState<string>("")
+  const currentYear = new Date().getFullYear()
+  const [selectedYear, setSelectedYear] = React.useState<string>(currentYear.toString())
   const [searchQuery, setSearchQuery] = React.useState<string>("")
   const [imagesData, setImagesData] = React.useState<NASAImagesResponse | null>(null)
   const [imagesLoading, setImagesLoading] = React.useState(false)
   const [imagesError, setImagesError] = React.useState<string | null>(null)
-  
-  // primeira foto da NASA foi em 1930
-  const currentYear = new Date().getFullYear()
   const years = Array.from({ length: currentYear - 1929 }, (_, i) => 
     (currentYear - i).toString()
   )
@@ -114,28 +112,29 @@ export function NasaCalendar() {
   }, [])
 
   return (
-    <div className="flex flex-col items-center gap-8 md:p-32 mx-auto w-full ">
+    <div className="flex flex-col items-center px-4 md:px-32 gap-8  w-full ">
       <ThemeToggle />
       <ScrollToTop />
       
       <div className="w-full flex flex-col items-center justify-center">
-        <div className="flex gap-4 justify-center w-full max-w-xl items-center md:-mt-32 mb-6 pl-10 pr-4 md:pr-2 ">
+        <div className="flex w-full items-center justify-center mx-auto max-w-xl ">
+            <div className="items-center justify-center w-full flex gap-4 pl-10">
         <Input
             type="text"
             placeholder="Search (optional)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-[340px] min-h-[50px]"
+            className="w-full min-h-[50px]"
           />
           <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger id="year-select" className="w-[240px] min-h-[50px]">
+            <SelectTrigger  id="year-select" className="w-[240px] cursor-pointer min-h-[50px]">
               <SelectValue placeholder="Select a year" />
             </SelectTrigger>
             <SelectContent>
             <SelectGroup className="w-[240px] h-[440px]">
               <SelectLabel className="text-left">Select a year</SelectLabel>
               {years.map((year) => (
-                <SelectItem key={year} value={year}>
+                <SelectItem key={year} value={year} className="cursor-pointer">
                   {year}
                 </SelectItem>
               ))}
@@ -143,27 +142,29 @@ export function NasaCalendar() {
             </SelectContent>
           </Select>
           
-         
+          </div>
         </div>
 
         {imagesLoading && (
-          <section className="bg-background py-8 w-full">
-            <div className="container mx-auto px-4">
-            <div className="flex justify-center w-full max-w-xl items-center mx-auto mb-10">
-                    <div className="h-0.25 ml-10 bg-muted rounded-md flex-1"/>
-            <p className="text-sm px-2 text-nowrap text-muted-foreground  text-center">
-                Found ... images
-              </p>
-              <div className="h-0.25 bg-muted rounded-md flex-1"/>
-              </div>
-              <div className="relative mx-auto max-w-xl pb-10">
+           <section className="py-8 w-full flex flex-col items-center justify-center">
+           
+
+           <div className="flex justify-center w-full items-center mb-10 max-w-xl">
+                   <div className="h-0.25 ml-10 bg-muted rounded-md flex-1"/>
+           <div className="text-sm px-2 text-nowrap text-muted-foreground  text-center">
+               Found <span className="animate-pulse">...</span> images
+             </div>
+             <div className="h-0.25 bg-muted rounded-md flex-1"/>
+             </div>
+             
+             <div className="relative w-full items-center justify-center max-w-xl pb-10">
                 <Separator
                   orientation="vertical"
                   className="bg-muted absolute left-2 top-0 bottom-0"
                 />
                 
                 {Array.from({ length: 5 }).map((_, index) => (
-                  <div key={index} className="relative mb-10 pl-8">
+                  <div key={index} className="relative mb-10 pl-10">
                     <div className="bg-muted-foreground absolute left-0 top-3.5 flex size-4 items-center justify-center rounded-full" />
                     
                     <Skeleton className="h-7 w-3/4 mb-2" />
@@ -171,7 +172,7 @@ export function NasaCalendar() {
                     <Skeleton className="h-5 w-24 mb-4 md:absolute md:left-[-120px] md:w-[100px]" />
                     
                     <Card className="my-5 border-none bg-transparent shadow-none">
-                      <CardContent className="px-0 xl:px-2">
+                      <CardContent className="px-0">
                         <Skeleton className="w-full h-64 rounded-lg mb-4" />
                         <Skeleton className="h-4 w-full mb-2" />
                         <Skeleton className="h-4 w-5/6 mb-2" />
@@ -181,7 +182,7 @@ export function NasaCalendar() {
                   </div>
                 ))}
               </div>
-            </div>
+            
           </section>
         )}
 
@@ -192,10 +193,10 @@ export function NasaCalendar() {
         )}
 
         {imagesData && !imagesLoading && !imagesError && (
-          <section className="bg-background py-8 w-full">
-            <div className="container mx-auto px-4 items-center justify-center">
+          <section className="py-8 w-full flex flex-col items-center justify-center">
+           
 
-            <div className="flex justify-center w-full max-w-xl items-center mx-auto mb-10">
+            <div className="flex justify-center w-full items-center mb-10 max-w-xl">
                     <div className="h-0.25 ml-10 bg-muted rounded-md flex-1"/>
             <p className="text-sm px-2 text-nowrap text-muted-foreground  text-center">
                 Found {imagesData.collection?.metadata?.total_hits || 0} images
@@ -203,7 +204,7 @@ export function NasaCalendar() {
               <div className="h-0.25 bg-muted rounded-md flex-1"/>
               </div>
               
-              <div className="relative mx-auto max-w-xl pb-10">
+              <div className="relative items-center justify-center max-w-xl pb-10">
                 <Separator
                   orientation="vertical"
                   className="bg-muted absolute left-2 top-0 bottom-0"
@@ -231,7 +232,7 @@ export function NasaCalendar() {
                       : "Unknown date"
 
                     return (
-                      <div key={index} className="relative mb-10 pl-8">
+                      <div key={index} className="relative mb-10 pl-10">
                         <div className="bg-muted-foreground absolute left-0 top-3.5 flex size-4 items-center justify-center rounded-full" />
                         
                         <h4 className="rounded-xl md:text-start py-2 text-xl font-bold tracking-tight xl:mb-4 xl:px-3">
@@ -243,7 +244,7 @@ export function NasaCalendar() {
                         </h5>
 
                         <Card className="my-5 border-none bg-transparent shadow-none">
-                          <CardContent className="px-0 xl:px-2">
+                          <CardContent className="px-0">
                             {imageLink.href && (
                               <img
                                 src={imageLink.href}
@@ -263,7 +264,7 @@ export function NasaCalendar() {
                     )
                   })}
               </div>
-            </div>
+            
           </section>
         )}
       </div>

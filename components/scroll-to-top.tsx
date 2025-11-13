@@ -40,7 +40,7 @@ export function ScrollToTop() {
       variant="default"
       size="icon"
       onClick={scrollToTop}
-      className="fixed bottom-8 right-8 z-50 rounded-full shadow-lg hover:shadow-xl transition-all"
+      className="fixed cursor-pointer bottom-8 right-8 z-50 rounded-full shadow-lg hover:shadow-xl transition-all"
       aria-label="Scroll to top"
     >
       <ArrowUp className="h-5 w-5" />
